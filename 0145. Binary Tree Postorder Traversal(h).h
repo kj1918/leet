@@ -18,10 +18,10 @@ public:
     }
     void trval(TreeNode* root){
         if(root->left){
-            postorderTraversal(root->left);
+            trval(root->left);
         }
         if(root->right){
-            postorderTraversal(root->right);
+            trval(root->right);
         }
         tree.push_back(root->val);
     }
