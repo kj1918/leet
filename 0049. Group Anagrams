@@ -1,0 +1,40 @@
+Given an array of strings, group anagrams together.
+
+Example:
+```
+Input: ["eat", "tea", "tan", "ate", "nat", "bat"],
+Output:
+[
+  ["ate","eat","tea"],
+  ["nat","tan"],
+  ["bat"]
+]
+```
+Note:
+
+All inputs will be in lowercase.
+The order of your output does not matter.
+
+使用map，以sort過的字串為標籤儲存，因為各個map中的second本身就是一個vector，所以可以直接push back進最後的輸出之中。
+
+```c
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        vector<string> origin=strs;
+        vector<vector<string>> re;
+        map<string,vector<string>> mp;
+        for(int i=0;i<strs.size();i++)
+        {
+            sort(strs[i].begin(),strs[i].end());
+            mp[strs[i]].push_back(origin[i]);
+        }
+        map<string,vector<string>>::iterator t;
+        for(t=mp.begin();t!=mp.end();t++)
+        {
+            re.push_back(t->second);
+        }
+        return re;
+    }
+};
+```
