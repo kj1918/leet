@@ -1,0 +1,96 @@
+Design and implement a data structure for Least Recently Used (LRU) cache. It should support the following operations: get and put.
+
+get(key) - Get the value (will always be positive) of the key if the key exists in the cache, otherwise return -1.
+put(key, value) - Set or insert the value if the key is not already present. When the cache reached its capacity, it should invalidate the least recently used item before inserting a new item.
+
+The cache is initialized with a positive capacity.
+
+Follow up:
+Could you do both operations in O(1) time complexity?
+
+Example:
+```
+LRUCache cache = new LRUCache( 2 /* capacity */ );
+
+cache.put(1, 1);
+cache.put(2, 2);
+cache.get(1);       // returns 1
+cache.put(3, 3);    // evicts key 2
+cache.get(2);       // returns -1 (not found)
+cache.put(4, 4);    // evicts key 1
+cache.get(1);       // returns -1 (not found)
+cache.get(3);       // returns 3
+cache.get(4);       // returns 4
+ ```
+ 用一個二維vector當cache，一個vector<int>當stack存LRU，put或get就去更新stack，注意由於可能會輸入同key不同value，這時不管stack順序如何就是要找出存key的地方填入，再去stack裡面把那個位置移到最後面。
+ 
+ ```c
+ class LRUCache {
+public:
+    vector<vector<int>> cache;
+    vector<int> stack;
+    LRUCache(int capacity) { 
+        cache.resize(capacity);
+        for(int i=0;i<cache.size();i++)
+        {
+            cache[i].resize(2,-1);
+        }
+    }
+    
+    int get(int key) {
+        for(int i=0;i<cache.size();i++)
+        {
+            if(cache[i][0]==key)
+            {
+                for(int k=0;k<stack.size();k++)
+                {
+                    if(stack[k]==i)
+                    {
+                        stack.erase(stack.begin()+k);
+                        stack.push_back(i);
+                    }
+                }
+                return cache[i][1];
+            }
+        }
+        return -1;
+    }
+    
+    void put(int key, int value) {
+        for(int i=0;i<cache.size();i++)
+        {
+            if(cache[i][0]==-1)
+            {
+                cache[i][0]=key;
+                cache[i][1]=value;
+                stack.push_back(i);
+                return;
+            }
+            if(cache[i][0]==key)
+            {
+                cache[i][1]=value;
+                for(int k=0;k<stack.size();k++)
+                {
+                    if(stack[k]==i)
+                    {
+                        stack.erase(stack.begin()+k);
+                    }
+                }
+                stack.push_back(i);
+                return;
+            }
+        }
+        cache[stack[0]][0]=key;
+        cache[stack[0]][1]=value;
+        stack.push_back(stack[0]);
+        stack.erase(stack.begin());
+    }
+};
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache* obj = new LRUCache(capacity);
+ * int param_1 = obj->get(key);
+ * obj->put(key,value);
+ */
+ ```
